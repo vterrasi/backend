@@ -4,93 +4,103 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
-// Le decimos a Java que esta clase va a manejar las peticiones del menú
 @RestController
 @RequestMapping("/menu")
 public class MenuController {
 
-    // 0. Ahora nuestra "base de datos" guarda objetos Plato con su nombre y su precio
+    // 1. Simulación de la persistencia: Lista estática con los ID tipo String como pide el enunciado
     private final List<Plato> platos = new ArrayList<>(List.of(
-            new Plato("Tacos de pollo", 12),
-            new Plato("Hamburguesa", 15),
-            new Plato("Ensalada", 8),
-            new Plato("Pizza Marinara", 10),
-            new Plato("Brochetas de pulpo", 18),
-            new Plato("Paella valenciana", 20),
-            new Plato("Lasaña de berenjena", 11)
+            new Plato("p01", "Tacos de pollo", 12.0f),
+            new Plato("p02", "Hamburguesa", 15.5f),
+            new Plato("p03", "Ensalada", 8.0f),
+            new Plato("p04", "Pizza Marinara", 10.0f),
+            new Plato("p05", "Brochetas de pulpo", 18.0f),
+            new Plato("p06", "Paella valenciana", 20.0f),
+            new Plato("p07", "Lasaña de berenjena", 11.2f)
     ));
 
-    // GET - Ver todos los platos (¡Ahora con filtro opcional!)
-    // Si entras a: http://localhost:8080/menu -> Te da T0DO
-    // Si entras a: http://localhost:8080/menu?maxRT=10 -> Solo platos con 10 letras o menos
-    // 1. El mét0do GET con el filtro opcional maxRT
+    // PETICIÓN 1: Obtener todo el listado de platos
+    // URL: http://localhost:8080/menu
     @GetMapping
-    public List<Plato> obtenerMenu(@RequestParam(name = "maxRT", required = false) Integer maxRT) {
+    public List<Plato> obtenerMenu() {
+        return platos;
+    }
 
-        // Si no ponen filtro, devolvemos toda la carta con sus precios
-        if (maxRT == null) {
-            return platos;
-        }
-
-        // Si ponen ?maxRT=12, buscamos los platos que cuesten 12€ o menos
-        List<Plato> platosFiltrados = new ArrayList<>();
-
+    // PETICIÓN 2: Obtener un plato en base a su id
+    // URL ejemplo: http://localhost:8080/menu/buscar-id/p03
+    @GetMapping("/buscar-id/{id}")
+    public Plato obtenerPorId(@PathVariable String id) {
         for (Plato p : platos) {
-            // ¡Aquí está la magia! Comparamos contra el precio real del plato
-            if (p.getPrecio() <= maxRT) {
-                platosFiltrados.add(p);
+            if (p.getId().equalsIgnoreCase(id)) {
+                return p; // Si lo encuentra, lo devuelve
             }
         }
-
-        return platosFiltrados;
+        return null; // Si no lo encuentra, devuelve vacío
     }
 
-    // 2. POST - Añadir un plato nuevo.
-    // Ahora el cliente nos manda un JSON con { "nombre": "Croquetas", "precio": 9 }
+    // PETICIÓN 3: Obtener un plato en base a su nombre
+    // URL ejemplo: http://localhost:8080/menu/buscar-nombre/Hamburguesa
+    @GetMapping("/buscar-nombre/{name}")
+    public Plato obtenerPorNombre(@PathVariable String name) {
+        for (Plato p : platos) {
+            if (p.getName().equalsIgnoreCase(name)) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    // EXTRA O REQUISITO: Añadir un plato (POST) para poder probar el resto bien
+    // URL: http://localhost:8080/menu
     @PostMapping
-    public String anadirPlato(@RequestBody Plato nuevoPlato) { // <-- Cambiado a Plato
+    public String anadirPlato(@RequestBody Plato nuevoPlato) {
         platos.add(nuevoPlato);
-        return "¡Plato añadido con éxito: " + nuevoPlato.getNombre() + " (" + nuevoPlato.getPrecio() + "€)!";
+        return "¡Plato añadido con éxito: " + nuevoPlato.getName() + "!";
     }
 
-    // 3. PUT - Reemplazar un plato entero
+    // PETICIÓN 4: Actualizar un plato (actualización completa) en base a su ID en la URL
+    // URL: http://localhost:8080/menu/p02
     @PutMapping("/{id}")
-    public String reemplazarPlato(@PathVariable int id, @RequestBody Plato platoModificado) { // <-- Cambiado a Plato
-        platos.set(id, platoModificado);
-        return "Plato en la posición " + id + " reemplazado por: " + platoModificado.getNombre();
+    public String actualizarPlato(@PathVariable String id, @RequestBody Plato platoModificado) {
+        for (int i = 0; i < platos.size(); i++) {
+            if (platos.get(i).getId().equalsIgnoreCase(id)) {
+                // Reemplazamos el plato viejo por el modificado en esa posición
+                platos.set(i, platoModificado);
+                return "Plato con ID " + id + " actualizado por completo a: " + platoModificado.getName();
+            }
+        }
+        return "No se encontró ningún plato con el ID: " + id;
     }
 
-    // 4. PATCH - Modificar solo un pedazo (Por ejemplo, cambiarle solo el precio)
-    // Nos mandan un número suelto en el cuerpo para actualizar el precio
-    @PatchMapping("/{id}")
-    public String parchearPrecioPlato(@PathVariable int id, @RequestBody int nuevoPrecio) { // <-- Cambiado para actualizar precio
-        Plato platoActual = platos.get(id);
-
-        // Creamos un plato nuevo con el mismo nombre pero el precio modificado
-        Plato platoActualizado = new Plato(platoActual.getNombre(), nuevoPrecio);
-        platos.set(id, platoActualizado);
-
-        return "Precio del plato '" + platoActual.getNombre() + "' actualizado a: " + nuevoPrecio + "€";
-    }
-
-    // 5. DELETE - Borrar un plato
+    // PETICIÓN 5: Borrar un plato en base a su ID
+    // URL: http://localhost:8080/menu/p01
     @DeleteMapping("/{id}")
-    public String borrarPlato(@PathVariable int id) {
-        Plato platoEliminado = platos.remove(id); // <-- Ahora recoge un objeto Plato
-        return "Se ha eliminado del menú: " + platoEliminado.getNombre();
+    public String borrarPlato(@PathVariable String id) {
+        for (int i = 0; i < platos.size(); i++) {
+            if (platos.get(i).getId().equalsIgnoreCase(id)) {
+                Plato eliminado = platos.remove(i);
+                return "Se ha eliminado del menú el plato: " + eliminado.getName();
+            }
+        }
+        return "No se pudo borrar. No existe el ID: " + id;
     }
 }
 
-// El molde para crear platos de verdad (Lo dejamos aquí abajo, fuera de la clase principal)
+// 2. El Modelo: El molde exacto con las propiedades que exige el enunciado (id, name, price)
 class Plato {
-    private String nombre;
-    private int precio;
+    private String id;     // <-- Cambiado a String como pide el ejercicio
+    private String name;   // <-- Cambiado a name
+    private float price;   // <-- Cambiado a price (float)
 
-    public Plato(String nombre, int precio) {
-        this.nombre = nombre;
-        this.precio = precio;
+    // Constructor corregido para aceptar el ID String
+    public Plato(String id, String name, float price) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
     }
 
-    public String getNombre() { return nombre; }
-    public int getPrecio() { return precio; }
+    // Getters necesarios para que Spring funcione
+    public String getId() { return id; }
+    public String getName() { return name; }
+    public float getPrice() { return price; }
 }
