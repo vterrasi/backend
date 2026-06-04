@@ -36,4 +36,35 @@ public class ProductService {
 
         return result;
     }
+
+    // 1. MÉT0DO PARA GUARDAR UN PRODUCTO NUEVO (POST)
+    public ProductModel guardarProducto(ProductModel nuevoProducto) {
+        // Añadimos el producto que nos llega a nuestra lista simulada
+        listaProductos.add(nuevoProducto);
+        // Por buena práctica, devolvemos el producto que se acaba de guardar
+        return nuevoProducto;
+    }
+
+    // 2. MÉT0DO PARA ACTUALIZAR UN PRODUCTO (PUT)
+    public Optional<ProductModel> actualizarProducto(String id, ProductModel datosNuevos) {
+        // Primero buscamos si el producto existe usando el mét0do que ya tenías
+        Optional<ProductModel> productoEncontrado = findById(id);
+
+        // Si existe, le cambiamos los datos viejos por los nuevos
+        if (productoEncontrado.isPresent()) {
+            ProductModel productoViejo = productoEncontrado.get();
+            productoViejo.setDesc(datosNuevos.getDesc());
+            productoViejo.setPrice(datosNuevos.getPrice());
+        }
+
+        return productoEncontrado; // Devolvemos el producto modificado (o vacío si no existía)
+    }
+
+    // 3. MÉT0DO PARA BORRAR UN PRODUCTO (DELETE)
+    public boolean borrarProducto(String id) {
+        // Intentamos borrar de la lista el producto que coincida con ese ID
+        // removeIf devuelve true si encontró el producto y lo borró, o false si no hizo nada
+        return listaProductos.removeIf(producto -> producto.getId().equals(id));
+    }
+
 }
