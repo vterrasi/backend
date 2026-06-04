@@ -20,11 +20,20 @@ public class RentalController {
         listadoPeliculas.add(new Movie("2", "Shrek", "Animacion", true));
         listadoPeliculas.add(new Movie("3", "Interstellar", "SciFi", false)); // Esta empieza no disponible
         listadoPeliculas.add(new Movie("4", "Constantine", "Accion", true));
+        listadoPeliculas.add(new Movie("5", "The Aviator", "Accion", true));
+        listadoPeliculas.add(new Movie("6", "Clockwork Orange", "Thriller Psicologico", true));
 
         // Añadimos un alquiler de prueba inicial (La película 3 ya está alquilada aquí)
         List<String> pelisAlquiladas = new ArrayList<>();
         pelisAlquiladas.add("3");
         listadoAlquileres.add(new RentaModel("RENT-100", pelisAlquiladas));
+
+        RentaModel alquiler2 = new RentaModel("RENT-101", List.of("1", "5"));
+        listadoAlquileres.add(alquiler2);
+
+        RentaModel alquiler3 = new RentaModel("RENT-102", List.of("1", "6"));
+        listadoAlquileres.add(alquiler3);
+
     }
 
     // --- 1. OBTENER TODOS LOS ALQUILERES ---
@@ -126,7 +135,7 @@ public class RentalController {
         return "El alquiler " + id + " ha sido procesado. Las películas vuelven a estar disponibles. El registro se mantiene en el sistema.";
     }
 
-    // --- MÉTODO AUXILIAR INTERNO ---
+    // --- MÉT0DO AUXILIAR INTERNO ---
     // Nos ayuda a buscar rápido una película por su ID en nuestra lista de simulación
     private Movie buscarPeliculaPorId(String id) {
         for (Movie m : listadoPeliculas) {
