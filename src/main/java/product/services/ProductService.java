@@ -5,6 +5,7 @@ import product.model.ProductModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service // <-- Le dice a Spring: "¡Soy el cocinero que maneja la lógica!"
 public class ProductService {
@@ -19,8 +20,20 @@ public class ProductService {
         listaProductos.add(new ProductModel("3", "Monitor 24 Pulgadas FHD", 119.50f));
     }
 
-    // El método que el controlador llamará para pedir la lista
+    // El mét0do que el controlador llamará para pedir la lista
     public List<ProductModel> obtenerTodosLosProductos() {
         return listaProductos;
+    }
+
+    public Optional<ProductModel> findById(String id) {
+        Optional<ProductModel> result = Optional.empty();
+
+        for (ProductModel productModel : listaProductos)
+
+            if ((productModel.getId().equals(id))){
+                result = Optional.of(productModel);
+            }
+
+        return result;
     }
 }
