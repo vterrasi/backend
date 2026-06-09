@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.LinkedHashMap; // Importamos esto para el mapa limpio
 
 @Service
 public class PurchaseService {
@@ -46,10 +47,10 @@ public class PurchaseService {
         }
 
         // ========================================================
-        // CANDADO 2: ¿La ID de esta compra ya está repetida?
+        // CANDADO 2: ¿La ID de esta compra ya se usó antes?
         // ========================================================
-        for (PurchaseModel compraExistente : purchaseList) {
-            if (compraExistente.getId().equals(newPurchase.getId())) {
+        for (PurchaseModel p : purchaseList) {
+            if (p.getId().equals(newPurchase.getId())) {
                 throw new ResponseStatusException(
                         HttpStatus.BAD_REQUEST,
                         "Error: Ya existe una compra registrada con la ID '" + newPurchase.getId() + "'."
@@ -58,15 +59,22 @@ public class PurchaseService {
         }
 
         // ========================================================
-        // CANDADO 3: ¿Existen todos los productos en el catálogo?
+        // CANDADO 3: ¿Todos los productos del mapa existen en el catálogo?
         // ========================================================
         Map<String, Integer> items = newPurchase.getPurchaseItems();
 
+        if (items == null || items.isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Error: La compra debe tener al menos un producto."
+            );
+        }
+
         for (String productoId : items.keySet()) {
-            // Limpiamos los espacios rebeldes por si acaso
+            // Le quitamos los espacios fantasmas de los lados a la ID
             String idLimpia = productoId.trim();
 
-            // ¡OJO AQUÍ! Buscamos usando 'idLimpia' (no productoId)
+            // ¡OJO AQUÍ! Buscamos usando 'idLimpia' (not productoId)
             if (productService.findById(idLimpia).isEmpty()) {
                 throw new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
@@ -77,21 +85,31 @@ public class PurchaseService {
 
         // ========================================================
         // PASO FINAL: Calcular el total de la compra (Amount)
+        // Y LIMPIAR de verdad las claves con espacios del mapa
         // ========================================================
         float totalCompra = 0.0f;
 
+        // Creamos un mapa nuevo, reluciente y vacío para meter las claves ya limpias
+        Map<String, Integer> itemsLimpios = new LinkedHashMap<>();
+
         for (Map.Entry<String, Integer> entry : items.entrySet()) {
-            // Volvemos a limpiar la ID para buscar de forma segura
+            // Volvemos a limpiar la ID para buscar de forma segura y guardarla peinada
             String idLimpia = entry.getKey().trim();
             Integer cantidad = entry.getValue();
 
-            // ¡OJO AQUÍ! Buscamos usando 'idLimpia'
+            // Buscamos usando 'idLimpia' en nuestro catálogo
             Optional<ProductModel> productoOpcional = productService.findById(idLimpia);
             ProductModel producto = productoOpcional.get();
 
             // Sumamos al total: precio del producto multiplicado por la cantidad
             totalCompra += producto.getPrice() * cantidad;
+
+            // ¡AQUÍ ESTÁ EL CAMBIAZO! Guardamos la ID limpia en el nuevo mapa
+            itemsLimpios.put(idLimpia, cantidad);
         }
+
+        // Le quitamos el mapa feo con espacios a la compra y le plantamos el limpio
+        newPurchase.setPurchaseItems(itemsLimpios);
 
         // Le asignamos el total calculado a la compra
         newPurchase.setAmount(totalCompra);

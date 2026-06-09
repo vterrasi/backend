@@ -1,14 +1,15 @@
 package product.controller;
 
-import org.springframework.http.HttpStatus;
 import product.model.PurchaseModel;
 import product.services.PurchaseService;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
 @RestController
-// Cambiamos esto para que vaya por la misma zona que "users" y "products"
 @RequestMapping("/apicurso/purchases")
 public class PurchaseController {
 
@@ -24,8 +25,17 @@ public class PurchaseController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED) // <-- Añade esto para que devuelva un 201
-    public PurchaseModel create(@RequestBody PurchaseModel purchase) {
-        return purchaseService.createPurchase(purchase);
+    public ResponseEntity<Object> create(@RequestBody PurchaseModel purchase) {
+        try {
+            // Intentamos hacer la compra normal
+            PurchaseModel compraCreada = purchaseService.createPurchase(purchase);
+            // Si sale bien, devolvemos un 201 CREATED con la compra calculada
+            return new ResponseEntity<>(compraCreada, HttpStatus.CREATED);
+        } catch (ResponseStatusException e) {
+            // ¡AQUÍ ESTÁ EL TRUCO!
+            // Si salta un candado del Service, agarramos tu mensaje (e.getReason())
+            // y obligamos a Thunder Client a pintarlo en la pantalla
+            return new ResponseEntity<>(e.getReason(), e.getStatusCode());
+        }
     }
 }
