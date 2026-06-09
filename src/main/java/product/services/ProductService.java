@@ -1,51 +1,65 @@
 package product.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import product.model.ProductModel;
-import product.repository.ProductRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class ProductService {
 
-    // Conectamos el mando a distancia real de la BD
-    @Autowired
-    private ProductRepository productRepository;
+    // 1. Creamos nuestra lista estática en memoria igual que en UserService
+    private static final List<ProductModel> productosDB = new ArrayList<>();
 
-    // 1. OBTENER TODOS
+    // 2. Metemos tus productos de prueba al arrancar el sistema
+    static {
+        productosDB.add(new ProductModel("P01", "Termo con asa rosa-violeta", 15.50f));
+        productosDB.add(new ProductModel("P02", "Almohadilla gris para el ratón", 4.00f));
+        productosDB.add(new ProductModel("P03", "Monitor de 20 pulgadas Dell", 20.00f));
+        productosDB.add(new ProductModel("P04", "Ventilador portátil recargable USB", 5.00f));
+    }
+
+    // Comentamos el repositorio para que no intente ir a MySQL de momento
+    // @Autowired
+    // private ProductRepository productRepository;
+
+    // 3. OBTENER TODOS (Ahora los lee de la lista)
     public List<ProductModel> obtenerTodosLosProductos() {
-        return productRepository.findAll(); // Busca en MySQL directo
+        return productosDB;
     }
 
-    // 2. BUSCAR POR ID (¡JPA ya te devuelve un Optional perfecto!)
+    // 4. BUSCAR POR ID (Buscamos manualmente en nuestra lista)
     public Optional<ProductModel> findById(String id) {
-        return productRepository.findById(id);
-    }
-
-    // 3. GUARDAR (POST)
-    public ProductModel guardarProducto(ProductModel nuevoProducto) {
-        return productRepository.save(nuevoProducto);
-    }
-
-    // 4. ACTUALIZAR (PUT)
-    public Optional<ProductModel> actualizarProducto(String id, ProductModel datosNuevos) {
-        // Aprovechamos el Optional que nos da findById
-        return productRepository.findById(id).map(productoViejo -> {
-            productoViejo.setDesc(datosNuevos.getDesc());
-            productoViejo.setPrice(datosNuevos.getPrice());
-            return productRepository.save(productoViejo); // Guarda y devuelve el actualizado
-        });
-    }
-
-    // 5. BORRAR (DELETE)
-    public boolean borrarProducto(String id) {
-        if (productRepository.existsById(id)) {
-            productRepository.deleteById(id);
-            return true;
+        for (ProductModel p : productosDB) {
+            if (p.getId().equals(id)) {
+                return Optional.of(p); // Lo encontramos
+            }
         }
-        return false;
+        return Optional.empty(); // No existe
+    }
+
+    // 5. GUARDAR (Por si quieres añadir nuevos desde Postman/Thunder Client)
+    public ProductModel guardarProducto(ProductModel nuevoProducto) {
+        productosDB.add(nuevoProducto);
+        return nuevoProducto;
+    }
+
+    // 6. ACTUALIZAR
+    public Optional<ProductModel> actualizarProducto(String id, ProductModel datosNuevos) {
+        for (ProductModel p : productosDB) {
+            if (p.getId().equals(id)) {
+                p.setDesc(datosNuevos.getDesc());
+                p.setPrice(datosNuevos.getPrice());
+                return Optional.of(p);
+            }
+        }
+        return Optional.empty();
+    }
+
+    // 7. BORRAR
+    public boolean borrarProducto(String id) {
+        return productosDB.removeIf(p -> p.getId().equals(id));
     }
 }

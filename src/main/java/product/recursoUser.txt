@@ -5,11 +5,8 @@ La práctica consiste en crear el recurso usuario: peticiones REST y código nec
 Clases necesarias:
  
 · UserModel
-
     id tipo String (identificador)
-
-    name tipo String 
-
+    name tipo String
     age tipo int
 
 · UserController
@@ -18,15 +15,20 @@ Clases necesarias:
  
 · Simular la capa de persistencia con un array estático que contenga las instancias de usuarios.
  
-Definiendo una combinación de URL y método http acorde con REST, implementando cada requisito en la capa apropiada, preparar las siguientes peticiones:
+Definiendo una combinación de URL y método http acorde con REST, implementando cada requisito en la capa apropiada,
+preparar las siguientes peticiones:
  
-· Obtener todos los usuarios, pudiendo seleccionar de forma opcional solo aquellos con una edad determinada enviada al servidor.
+· Obtener todos los usuarios, pudiendo seleccionar de forma opcional solo aquellos con una edad determinada enviada
+al servidor.
 
 · Obtener un usuario en base a su id.
 
-· Crear un usuario. El sistema que estamos usando no permite que se introduzcan usuarios cuyo nombre contenga alguna "ñ", no permitir la inserción en estos casos.
+· Crear un usuario. El sistema que estamos usando no permite que se introduzcan usuarios cuyo nombre
+contenga alguna "ñ", no permitir la inserción en estos casos.
 
-· Actualizar completamente un usuario (menos la id) en base a su id. No se permitirá la actualización de usuarios cuya edad actual (no el valor con el que se quiere actualizar) sea menor de 21 años.
+· Actualizar completamente un usuario (menos la id) en base a su id. No se permitirá la actualización de
+usuarios cuya edad actual (no el valor con el que se quiere actualizar) sea menor de 21 años.
 
-· Borrar un usuario en base a su id. Se habrá de devolver en la API, si se ha borrado el usuario, los datos completos del usuario. Si no se consigue borrar, se devolverá un mensaje indicando que no se ha encontrado.
+· Borrar un usuario en base a su id. Se habrá de devolver en la API, si se ha borrado el usuario, los datos
+completos del usuario. Si no se consigue borrar, se devolverá un mensaje indicando que no se ha encontrado.
  

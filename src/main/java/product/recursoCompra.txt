@@ -1,0 +1,26 @@
+* La práctica consiste en crear el recurso compra; peticiones REST y código necesario.
+* Clases necesarias:
+    · Purchase model
+        id tipo string
+        userID tipo string - Es la id del usuario que hace la compra.
+        amount tipo float - El total de la compra.
+        purchaseItems tipo Map - Es una colección de pares de valores que mapea una id de producto a la cantidad
+        que se ha comprado de ese producto.
+    · Purchase Controller
+    · Purchase Service
+* Definiendo una combinación de URL y método http acorde con REST, preparar las siguientes peticiones:
+    · Obtener todas las compras.
+    · Crear una compra.
+    Requisitos:
+        · Comprobar que la id de usuario se corresponde con un usuario ya existente.
+        · Comprobar que no haya una compra con esa id ya creada.
+        · Comprobar que todos los productos están en el listado de productos.
+Ante el fallo de cualquiera de estas comprobaciones el sistema devolverá un mensaje apropiado,
+indicando qué ha fallado en concreto y un código http de estado apropiado.
+Es suficiente con devolver el primer fallo encontrado. Si fallan varios casos no es necesario "agrupar" mensajes.
+    · Una vez pasen todas las comprobaciones, el sistema calculará el total de la compra con base en el precio
+    almacenado de cada uno de los productos.
+CONSEJO - Primero hacer funcionar una inserción básica de compra, a partir de ahí añadir el resto de requisitos.
+PISTA - Si la gestión del mensaje de respuesta al usuario, según falle alguna de las comprobaciones,
+se hace compleja, considerar una respuesta alternativa y específica del servicio para encapsular
+la información que irá al controlador.
