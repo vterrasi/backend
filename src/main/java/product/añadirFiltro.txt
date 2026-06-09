@@ -1,0 +1,63 @@
+### Buscar productos que cuesten como máximo 50 euros
+GET http://localhost:8080/apicurso/products?precioMaximo=50
+
+Paso 1: El Repositorio (ProductRepository.java)
+Por defecto, JpaRepository te regala el findAll() (traer t0do). Pero como ahora
+quieres traer solo los que cumplan una condición, tienes que escribir una "frase mágica"
+en la interfaz. Hibernate la leerá y creará el código SQL él solo:
+
+package product.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import product.model.ProductModel;
+import java.util.List;
+
+@Repository
+public interface ProductRepository extends JpaRepository<ProductModel, String> {
+
+    // ¡La frase mágica! Spring entiende "findByPriceLessThanEqual"
+    // y sabe que tiene que buscar en MySQL los precios menores o iguales al que le pases.
+    List<ProductModel> findByPriceLessThanEqual(float maxPrice);
+}
+
+Paso 2: El Servicio (ProductService.java)
+En el servicio simplemente creas un método intermedio
+que llame a esa frase mágica
+que acabamos de inventar en el repositorio.
+
+// Dentro de ProductService.java
+
+public List<ProductModel> buscarPorPrecioMaximo(float precio) {
+    return productRepository.findByPriceLessThanEqual(precio);
+}
+
+Paso 3: El Controlador (ProductController.java)
+Aquí viene la magia del GET. Para atrapar ese ?precioMaximo=50 que viene en la URL,
+usamos una anotación llamada @RequestParam.
+
+Lo ideal es meterlo dentro del mismo mét0do getProducts() que ya tienes, haciéndolo opcional.
+Así, si no le pasas filtro, te da t0do; y si se lo pasas, filtra.
+
+// Dentro de ProductController.java
+
+@GetMapping("/products")
+public ResponseEntity<List<ProductModel>> getProducts(
+        // Le decimos que busque "?precioMaximo" en la URL.
+        // "required = false" significa que si no lo ponen, no pasa nada (valdrá null).
+        @RequestParam(required = false) Float precioMaximo
+) {
+    // Si el usuario ha puesto un precio en la URL...
+    if (precioMaximo != null) {
+        return new ResponseEntity<>(
+                productService.buscarPorPrecioMaximo(precioMaximo),
+                HttpStatus.OK
+        );
+    }
+
+    // Si no ha puesto nada, hacemos lo de siempre: devolver todos
+    return new ResponseEntity<>(
+            productService.obtenerTodosLosProductos(),
+            HttpStatus.OK
+    );
+}

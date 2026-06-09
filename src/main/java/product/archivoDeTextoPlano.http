@@ -1,0 +1,12 @@
+### Obtener todos los productos
+GET http://localhost:8080/apicurso/products
+
+### Crear un producto nuevo
+POST http://localhost:8080/apicurso/products
+Content-Type: application/json
+
+{
+  "id": "PROD002",
+  "desc": "Teclado Mecánico",
+  "price": 49.99
+}

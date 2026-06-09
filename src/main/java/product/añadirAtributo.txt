@@ -1,0 +1,69 @@
+Ejemplo de enunciado: "Basándote en el proyecto de productos que ya tienes,
+añade un nuevo endpoint que permita buscar productos filtrando por un precio máximo,
+o añade un atributo nuevo al modelo (como stock) y adapta todas las capas
+(controlador, servicio y base de datos) para que funcione con ese nuevo dato".
+
+Imagina que el enunciado dice:
+
+"Añade el atributo stock (un número entero) a tu API de productos.
+Asegúrate de que se guarde en la base de datos y actualiza los métodos necesarios
+para que el sistema lo soporte."
+
+
+Paso 1: Modificar el molde (ProductModel.java)
+T0do empieza en el modelo. Si queremos que los productos tengan stock, hay que
+decírselo a la clase que habla con Hibernate. Solo tienes que añadir
+la variable y sus "botones" (Getters y Setters).
+
+// Dentro de ProductModel.java
+
+private int stock; // <-- 1. Añades la nueva propiedad
+
+// 2. Te aseguras de añadirlo al constructor si quieres usarlo al crear objetos
+public ProductModel(String id, String desc, float price, int stock) {
+    this.id = id;
+    this.desc = desc;
+    this.price = price;
+    this.stock = stock;
+}
+
+// 3. ¡Súper importante! Generas su Getter y Setter (con el autocompletar de IntelliJ se hace en un segundo)
+public int getStock() { return stock; }
+public void setStock(int stock) { this.stock = stock; }
+
+Paso 2: El Repositorio (ProductRepository.java)
+¿Qué hay que hacer aquí? ¡NADA! 🥳
+Como tu repositorio hereda de JpaRepository, él solito se adapta. Ya sabe que ahora,
+cuando guarde un ProductModel, tendrá que incluir el campo del stock. Este archivo no se toca.
+
+Paso 3: Actualizar la lógica del Servicio (ProductService.java)
+Aquí es donde la mayoría de la gente se confunde en los exámenes, pero es una tontería si sigues
+ el caminito del dato. El método de guardar (save) funciona solo, pero el método
+ de actualizar (el PUT) necesita que le digas explícitamente que también quieres
+ actualizar el stock de los productos viejos.
+
+// Dentro de ProductService.java
+
+public Optional<ProductModel> actualizarProducto(String id, ProductModel datosNuevos) {
+    return productRepository.findById(id).map(productoViejo -> {
+        productoViejo.setDesc(datosNuevos.getDesc());
+        productoViejo.setPrice(datosNuevos.getPrice());
+
+        productoViejo.setStock(datosNuevos.getStock()); // <-- ¡ESTA ES LA LÍNEA CLAVE!
+
+        return productRepository.save(productoViejo);
+    });
+}
+
+Paso 4: ¿El Controlador cambia? (ProductController.java)
+Tampoco hace falta tocarlo. ¿Por qué? Porque el controlador usa @RequestBody ProductModel nuevoProducto.
+Spring es tan listo que, cuando reciba el JSON modificado, meterá el stock dentro del objeto automáticamente.
+
+El JSON que usarías en tu archivo .http de IntelliJ para probarlo pasaría de ser el antiguo a ser este:
+
+{
+  "id": "PROD001",
+  "desc": "Ratón Gaming",
+  "price": 25.50,
+  "stock": 14
+}

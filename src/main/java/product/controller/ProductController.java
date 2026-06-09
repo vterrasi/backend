@@ -30,18 +30,18 @@ public class ProductController {
         // El controlador ya no inventa una lista vacía, se la pide al servicio
 
         return new ResponseEntity<>(
-            productService.obtenerTodosLosProductos()
-            , HttpStatus.OK
+                productService.obtenerTodosLosProductos()
+                , HttpStatus.OK
         );
     }
     @GetMapping ("/products/{id}")
     public ResponseEntity<Object> getProductById(
-        @PathVariable String id
+            @PathVariable String id
     ) {
         Optional<ProductModel> result = productService.findById(id);
 
         return new ResponseEntity<>(
-                result.isPresent() ? result.get() : "producto no encontrado" ,
+                result.isPresent() ? result.get() : "Producto no encontrado" ,
                 result.isPresent() ? HttpStatus.OK : HttpStatus.NOT_FOUND
         );
     }
@@ -78,7 +78,4 @@ public class ProductController {
             return new ResponseEntity<>("No se pudo eliminar, producto no encontrado", HttpStatus.NOT_FOUND);
         }
     }
-
-
-
 }

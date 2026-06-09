@@ -1,11 +1,20 @@
 package product.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity // <-- ¡MÁGICO! Esto le dice a Hibernate que cree la tabla en MySQL
+@Table(name = "products") // <-- Así se llamará la tabla en tu base de datos
 public class ProductModel {
+
+    @Id // <-- Le dice que el "id" es la clave primaria (única)
     private String id;
+    @jakarta.persistence.Column(name = "descripcion")
     private String desc;
     private float price;
 
-    // Constructor vacío estándar para Spring/Jackson
+    // Constructor vacío estándar (¡Súper obligatorio para Jackson y Hibernate!)
     public ProductModel() {
     }
 
