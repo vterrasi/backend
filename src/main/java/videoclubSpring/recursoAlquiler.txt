@@ -1,0 +1,21 @@
+La práctica consiste en crear el recurso alquiler: colección. peticiones REST y codigo necessario
+Clases necesarias:
+    RentModel
+    id tipo String
+    Movies tipo List<String> // Contiene las Ids de las películas
+    Rental Controlller
+
+    Definiendo una combinación de URL y método http acorde con REST, preparar las siguientes peticiones:
+    - Obtener todos los alquileres.
+    - Obtener un alquiler en base a su id
+    - Obtener alquileres en base a la id de una película (puede haber varios alquileres que tengan la misma pelicula).
+
+    Crear un alquiler, para lo que sea necesario:
+        - Refactorizar el modelo de 'Movie' y añadirle un campo booleano "available", por defecto a true.
+        - Comprobar que la id's de las películas propuestas para el alquiler se corresponden con ls películas disponibles (available es true).
+        - Poner las películas del alquiler como no disponibles.
+        - Crear el alquiler.
+    Borrar un alquiler, para lo que será necesario:
+        - Poner las películas que lo componen a disponible
+        - El alquiler en sí no se borrará, quedando para consultarlo.
+        NOTA - Simula el conjunto de alquileres de forma similar a las películas.

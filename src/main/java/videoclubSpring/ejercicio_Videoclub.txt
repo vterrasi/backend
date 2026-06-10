@@ -1,0 +1,37 @@
+** Queremos simular el funcionamiento de un antiguo videoclub.
+· El videoclub tendrá una serie de películas disponibles en catálogo.
+· Cada película tendrá un título, un género, stock disponible y si es una novedad o no.
+· El sistema mostrará un menú por consola en el que cualquier usuario podrá:
+    · Ver las películas disponibles para alquilar en un listado.
+    · Alquilar una película disponible (usando su título; se almacenarán en memoria usando
+    el título de la película y el precio; solo se puede alquilar una película).
+    · Devolver una película alquilada (usando su título se pondrá disponible y se borrará
+    el alquiler del listado de alquileres).
+    · Identificarse como administrador (se pedirá un nombre de usuario y contraseña).
+    · Salir.
+· El sistema contará con usuarios administradores, que tendrán un nombre de usuario y contraseña,
+almacenados en memoria o en código.
+· Si el usuario se identifica como administrador, se añadirán además al menú las opciones:
+    · Añadir una película al sistema (se pedirán por consola los datos).
+    · Ver los alquileres actuales de un listado.
+· Un alquiler tendrá una película asociada y un precio.
+· El precio será de 3€ para películas normales y 5€ para novedades.
+· Si una película ya está alquilada, no se podrá alquilar y no se mostrará en el catálogo de disponibles
+(pero sí en los alquileres).
+
+
+EXTRAS
+- Creación de un usuario. El sistema mostrará, entre las opciones disponibles del menú normal
+(no el de administración), la creación de un usuario.
+- Cada usuario tendrá un nombre y unos alquileres asociados.
+- El sistema permitirá seleccionar un usuario de un listado para ser el que realice los alquileres.
+- El usuario se podrá cambiar seleccionando otro.
+- Se podrán hacer alquileres tanto con un usuario seleccionado, como sin uno seleccionado.
+- En el caso de tener un usuario seleccionado, si se realiza un alquiler de una película,
+este alquiler se guarda en los alquileres del usuario.
+- Un usuario, que esté seleccionado, podrá ver su alquiler activo en este momento (este menú
+solo se mostrará si hay un usuario seleccionado y si este tiene un alquiler activo).
+- En el menú de administración, se podrán buscar alquileres en base a un nombre de usuario,
+devolviéndose un listado con los encontrados.
+
+    EXTRA (del Extra) · Gestionar los usuarios usando contraseñas e identificación.
